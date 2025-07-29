@@ -23,7 +23,7 @@ public class DatabaseInitializer {
 
 	private void initTables() {
 		this.jdbcTemplate.execute("""
-			 CREATE TABLE buyer (
+			 CREATE TABLE IF NOT EXISTS buyer (
 				 buyer_id INT auto_increment PRIMARY KEY,
 				 first_name varchar(100) NOT NULL,
 				 last_name varchar(100) NOT NULL,
