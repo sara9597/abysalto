@@ -1,6 +1,6 @@
 package hr.abysalto.hiring.mid;
 
-import hr.abysalto.hiring.mid.model.BuyerRequest;
+import hr.abysalto.hiring.mid.dto.BuyerRequest;
 import hr.abysalto.hiring.mid.model.Buyer;
 import hr.abysalto.hiring.mid.service.BuyerService;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,6 @@ public class BuyerControllerTest {
 
     @Test
     public void testGetBuyerById() throws Exception {
-        // First create a buyer
         BuyerRequest request = new BuyerRequest("Test", "User", "Mr");
         Buyer createdBuyer = buyerService.createBuyer(request);
 

@@ -1,6 +1,6 @@
 package hr.abysalto.hiring.mid.service.impl;
 
-import hr.abysalto.hiring.mid.model.BuyerRequest;
+import hr.abysalto.hiring.mid.dto.BuyerRequest;
 import hr.abysalto.hiring.mid.model.Buyer;
 import hr.abysalto.hiring.mid.repository.BuyerRepository;
 import hr.abysalto.hiring.mid.service.BuyerService;

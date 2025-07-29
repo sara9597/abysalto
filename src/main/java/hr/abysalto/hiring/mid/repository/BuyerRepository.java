@@ -43,7 +43,6 @@ public class BuyerRepository {
 
     public Buyer save(Buyer buyer) {
         if (buyer.getBuyerId() == null) {
-            // Insert new buyer and get generated key
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(
@@ -57,7 +56,6 @@ public class BuyerRepository {
             }, keyHolder);
             buyer.setBuyerId(keyHolder.getKey().intValue());
         } else {
-            // Update existing buyer
             jdbcTemplate.update(
                     "UPDATE buyer SET first_name = ?, last_name = ?, title = ? WHERE buyer_id = ?",
                     buyer.getFirstName(),

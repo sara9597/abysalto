@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BuyerRequest {
-    private String firstName;
-    private String lastName;
-    private String title;
-}
+public class Favorite {
+    private Integer favoriteId;
+    private Integer userId;
+    private Integer productId;
+    private Product product;
+} 

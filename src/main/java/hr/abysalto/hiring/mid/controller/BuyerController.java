@@ -1,6 +1,6 @@
 package hr.abysalto.hiring.mid.controller;
 
-import hr.abysalto.hiring.mid.model.BuyerRequest;
+import hr.abysalto.hiring.mid.dto.BuyerRequest;
 import hr.abysalto.hiring.mid.model.Buyer;
 import hr.abysalto.hiring.mid.service.BuyerService;
 import io.swagger.v3.oas.annotations.Operation;

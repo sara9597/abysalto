@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configurers.CsrfConfig
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -32,15 +34,34 @@ public class SecurityConfig {
 			}).authorizeHttpRequests(authorizeRequests ->
 											 authorizeRequests.requestMatchers("/swagger-ui/**").permitAll()
 															  .requestMatchers("/v3/api-docs*/**").permitAll()
+															  .requestMatchers("/buyer/**").permitAll()
+															  .requestMatchers("/api/buyers/**").permitAll()
+															  .requestMatchers("/api/products/**").permitAll()
+															  .requestMatchers("/api/users/**").permitAll()
+															  .requestMatchers("/api/cart/**").permitAll()
+															  .requestMatchers("/api/favorites/**").permitAll()
+															  .requestMatchers("/ecommerce/**").permitAll()
+															  .requestMatchers("/h2-console/**").permitAll()
 															  .anyRequest().authenticated())
 			.httpBasic(Customizer.withDefaults())
 			.formLogin(Customizer.withDefaults());
 		return http.build();
 	}
 
+@Bean
+public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+	UserDetails userDetails = User.builder()
+			.username("user")
+			.password(passwordEncoder.encode("password")) // enkodirana lozinka
+			.roles("USER")
+			.build();
+
+	return new InMemoryUserDetailsManager(userDetails);
+}
+
+
 	@Bean
-	public UserDetailsService userDetailsService() {
-		UserDetails userDetails = User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build();
-		return new InMemoryUserDetailsManager(userDetails);
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 }

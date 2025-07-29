@@ -1,6 +1,6 @@
 package hr.abysalto.hiring.mid.service;
 
-import hr.abysalto.hiring.mid.model.BuyerRequest;
+import hr.abysalto.hiring.mid.dto.BuyerRequest;
 import hr.abysalto.hiring.mid.model.Buyer;
 
 import java.util.List;
