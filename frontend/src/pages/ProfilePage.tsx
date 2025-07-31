@@ -1,8 +1,7 @@
 import React from 'react';
-import { Card, Row, Col, Button, Alert, Spinner } from 'react-bootstrap';
-import {useProfile} from "./hooks/useProfile";
-import {LoadingComponent} from "../components/LoadingComponent";
-import {LoginWarning} from "../components/LoginWarning";
+import { Card, Row, Col, Button } from 'react-bootstrap';
+import { useProfile } from './hooks/useProfile';
+import { LoadingComponent, LoginWarning, PageHeader } from '../components';
 
 const ProfilePage: React.FC = () => {
   const {
@@ -12,20 +11,16 @@ const ProfilePage: React.FC = () => {
   } = useProfile();
 
   if (loading) {
-    return (
-      <LoadingComponent />
-    );
+    return <LoadingComponent />;
   }
 
   if (!currentUser) {
-    return (
-      <LoginWarning />
-    );
+    return <LoginWarning />;
   }
 
   return (
     <div>
-      <h2 className="mb-4">User Profile</h2>
+      <PageHeader title="User Profile" />
       
       <Card>
         <Card.Body>
