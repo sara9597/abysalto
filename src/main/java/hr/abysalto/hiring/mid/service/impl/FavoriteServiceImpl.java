@@ -58,9 +58,6 @@ public class FavoriteServiceImpl implements FavoriteService {
         favorite.setProductId(productId);
         favorite.setProduct(product);
 
-        if(!userService.getUserById(userId).isPresent()) {
-            throw new RuntimeException("User not found with ID: " + userId);
-        }
         try {
             Favorite savedFavorite = favoriteRepository.save(favorite);
             return savedFavorite;

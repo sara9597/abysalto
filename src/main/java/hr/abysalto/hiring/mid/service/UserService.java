@@ -10,13 +10,13 @@ public interface UserService {
     
     List<User> getAllUsers();
     
-    Optional<User> getUserById(Integer id);
+    User getUserById(Integer id);
     
-    Optional<User> getUserByUsername(String username);
+    User getUserByUsername(String username);
     
     User registerUser(UserRegistrationRequest request);
     
-    Optional<User> authenticateUser(LoginRequest request);
+    User authenticateUser(LoginRequest request);
     
     User updateUser(Integer id, UserRegistrationRequest request);
     

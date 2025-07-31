@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/products")
@@ -30,7 +31,7 @@ public class ProductController {
             @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit,
             @Parameter(description = "Sort field (title, price, rating, stock)") @RequestParam(defaultValue = "title") String sortBy,
             @Parameter(description = "Sort direction (asc, desc)") @RequestParam(defaultValue = "asc") String sortOrder) {
-        
+
         ProductResponse response = productService.getAllProducts(skip, limit, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
@@ -38,8 +39,15 @@ public class ProductController {
     @GetMapping("/{id}")
     @Operation(summary = "Get product by ID")
     public ResponseEntity<Product> getProductById(@PathVariable Integer id) {
-        Product product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+        try {
+            Product product = productService.getProductById(id);
+            if (product == null) {
+                throw new NoSuchElementException("Product not found with ID: " + id);
+            }
+            return ResponseEntity.ok(product);
+        } catch (RuntimeException e) {
+            throw new NoSuchElementException("Product not found with ID: " + id);
+        }
     }
 
     @GetMapping("/categories")
@@ -58,7 +66,7 @@ public class ProductController {
             @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit,
             @Parameter(description = "Sort field (title, price, rating, stock)") @RequestParam(defaultValue = "title") String sortBy,
             @Parameter(description = "Sort direction (asc, desc)") @RequestParam(defaultValue = "asc") String sortOrder) {
-        
+
         ProductResponse response = productService.getProductsByCategory(category, skip, limit, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
@@ -72,6 +80,9 @@ public class ProductController {
             @Parameter(description = "Sort field (title, price, rating, stock)") @RequestParam(defaultValue = "title") String sortBy,
             @Parameter(description = "Sort direction (asc, desc)") @RequestParam(defaultValue = "asc") String sortOrder) {
 
+        if (query == null || query.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search query cannot be empty");
+        }
         ProductResponse response = productService.searchProducts(query, skip, limit, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }

@@ -25,6 +25,10 @@ public class FavoriteController {
     @GetMapping
     @Operation(summary = "Get user's favorites")
     public ResponseEntity<List<Favorite>> getUserFavorites(@RequestParam Integer userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
         List<Favorite> favorites = favoriteService.getUserFavorites(userId);
         return ResponseEntity.ok(favorites);
     }
@@ -32,8 +36,19 @@ public class FavoriteController {
     @PostMapping("/add")
     @Operation(summary = "Add product to favorites")
     public ResponseEntity<Favorite> addToFavorites(@RequestParam Integer userId, @RequestParam Integer productId) {
-         Favorite favorite = favoriteService.addToFavorites(userId, productId);
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (productId == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
+
+        try {
+            Favorite favorite = favoriteService.addToFavorites(userId, productId);
             return ResponseEntity.status(HttpStatus.CREATED).body(favorite);
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException("Failed to add product to favorites: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/remove")
@@ -41,6 +56,12 @@ public class FavoriteController {
     public ResponseEntity<Void> removeFromFavorites(
             @Parameter(description = "User ID") @RequestParam Integer userId,
             @Parameter(description = "Product ID") @RequestParam Integer productId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (productId == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
         favoriteService.removeFromFavorites(userId, productId);
         return ResponseEntity.noContent().build();
     }
@@ -48,6 +69,12 @@ public class FavoriteController {
     @GetMapping("/check")
     @Operation(summary = "Check if product is in user's favorites")
     public ResponseEntity<Boolean> isFavorite(@RequestParam Integer userId, @RequestParam Integer productId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (productId == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
         boolean isFavorite = favoriteService.isFavorite(userId, productId);
         return ResponseEntity.ok(isFavorite);
     }
