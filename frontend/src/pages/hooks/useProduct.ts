@@ -80,14 +80,11 @@ export const useProduct = () => {
         };
     }, [searchQuery, loadProducts]);
 
-    // Load products when other filters change
-    // useEffect(() => {
-    //   loadProducts();
-    // }, [currentPage, sortBy, sortOrder, selectedCategory, loadProducts]);
 
     useEffect(() => {
         loadCategories();
         loadProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleAddToCart = async (productId: number) => {
