@@ -17,7 +17,8 @@ public class CacheConfig {
                 "product", 
                 "categories",
                 "productsByCategory",
-                "searchProducts"
+                "searchProducts",
+                "searchResults"
         );
     }
 } 

@@ -1,19 +1,19 @@
 package hr.abysalto.hiring.mid.service;
 
 import hr.abysalto.hiring.mid.dto.ProductResponse;
+import hr.abysalto.hiring.mid.model.Category;
 import hr.abysalto.hiring.mid.model.Product;
 import java.util.List;
-import java.util.Optional;
 
 public interface ProductService {
 
-    ProductResponse getAllProducts(int skip, int limit);
+    ProductResponse getAllProducts(int skip, int limit, String sortBy, String sortOrder);
 
-    Optional<Product> getProductById(Integer id);
+    Product getProductById(Integer id);
     
-    List<String> getCategories();
-    
-    ProductResponse getProductsByCategory(String category, int skip, int limit);
-    
-    ProductResponse searchProducts(String query, int skip, int limit);
+    List<Category> getCategories();
+
+    ProductResponse getProductsByCategory(String category, int skip, int limit, String sortBy, String sortOrder);
+
+    ProductResponse searchProducts(String query, int skip, int limit, String sortBy, String sortOrder);
 } 

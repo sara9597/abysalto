@@ -2,8 +2,9 @@ package hr.abysalto.hiring.mid.controller;
 
 import hr.abysalto.hiring.mid.dto.CartItemRequest;
 import hr.abysalto.hiring.mid.model.CartItem;
-import hr.abysalto.hiring.mid.service.CartService;
+import hr.abysalto.hiring.mid.service.impl.CartServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,54 +17,52 @@ import java.util.List;
 @Tag(name = "Shopping Cart", description = "APIs for shopping cart management")
 public class CartController {
     
-    private final CartService cartService;
+    private final CartServiceImpl cartService;
     
-    public CartController(CartService cartService) {
+    public CartController(CartServiceImpl cartService) {
         this.cartService = cartService;
     }
-    
+
     @GetMapping
     @Operation(summary = "Get user's shopping cart")
-    public ResponseEntity<List<CartItem>> getUserCart(@RequestParam Integer userId) {
+    public ResponseEntity<List<CartItem>> getUserCart(
+            @Parameter(description = "User ID") @RequestParam Integer userId) {
         List<CartItem> cartItems = cartService.getUserCart(userId);
         return ResponseEntity.ok(cartItems);
     }
-    
+
     @PostMapping("/add")
     @Operation(summary = "Add product to cart")
-    public ResponseEntity<CartItem> addToCart(@RequestParam Integer userId, @RequestBody CartItemRequest request) {
-        try {
-            CartItem cartItem = cartService.addToCart(userId, request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(cartItem);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<CartItem> addToCart(
+            @Parameter(description = "User ID") @RequestParam Integer userId,
+            @RequestBody CartItemRequest request) {
+        CartItem cartItem = cartService.addToCart(userId, request.getProductId(), request.getQuantity());
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartItem);
     }
-    
+
     @PutMapping("/update")
     @Operation(summary = "Update cart item quantity")
     public ResponseEntity<CartItem> updateCartItemQuantity(
-            @RequestParam Integer userId,
-            @RequestParam Integer productId,
-            @RequestParam Integer quantity) {
-        try {
-            CartItem cartItem = cartService.updateCartItemQuantity(userId, productId, quantity);
-            return ResponseEntity.ok(cartItem);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+            @Parameter(description = "User ID") @RequestParam Integer userId,
+            @Parameter(description = "Product ID") @RequestParam Integer productId,
+            @Parameter(description = "New quantity") @RequestParam Integer quantity) {
+        CartItem cartItem = cartService.updateCartItemQuantity(userId, productId, quantity);
+        return ResponseEntity.ok(cartItem);
     }
-    
+
     @DeleteMapping("/remove")
     @Operation(summary = "Remove product from cart")
-    public ResponseEntity<Void> removeFromCart(@RequestParam Integer userId, @RequestParam Integer productId) {
-        boolean removed = cartService.removeFromCart(userId, productId);
-        return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<Void> removeFromCart(
+            @Parameter(description = "User ID") @RequestParam Integer userId,
+            @Parameter(description = "Product ID") @RequestParam Integer productId) {
+        cartService.removeFromCart(userId, productId);
+        return ResponseEntity.noContent().build();
     }
-    
+
     @DeleteMapping("/clear")
-    @Operation(summary = "Clear user's cart")
-    public ResponseEntity<Void> clearCart(@RequestParam Integer userId) {
+    @Operation(summary = "Clear user's entire cart")
+    public ResponseEntity<Void> clearCart(
+            @Parameter(description = "User ID") @RequestParam Integer userId) {
         cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }

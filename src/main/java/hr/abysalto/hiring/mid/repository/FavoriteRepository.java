@@ -53,28 +53,40 @@ public class FavoriteRepository {
         );
         return favorites.isEmpty() ? Optional.empty() : Optional.of(favorites.get(0));
     }
-    
+
     public Favorite save(Favorite favorite) {
-        if (favorite.getFavoriteId() == null) {
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(
-                        "INSERT INTO favorites (user_id, product_id) VALUES (?, ?)",
-                        Statement.RETURN_GENERATED_KEYS
-                );
-                ps.setInt(1, favorite.getUserId());
-                ps.setInt(2, favorite.getProductId());
-                return ps;
-            }, keyHolder);
-            favorite.setFavoriteId(keyHolder.getKey().intValue());
-        } else {
-            jdbcTemplate.update(
-                    "UPDATE favorites SET user_id = ?, product_id = ? WHERE favorite_id = ?",
-                    favorite.getUserId(),
-                    favorite.getProductId(),
-                    favorite.getFavoriteId()
-            );
+        if (favorite == null) {
+            throw new IllegalArgumentException("Favorite cannot be null");
         }
+        if (favorite.getUserId() == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        if (favorite.getProductId() == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
+
+        if (existsByUserIdAndProductId(favorite.getUserId(), favorite.getProductId())) {
+            throw new IllegalStateException("Favorite already exists for user " + favorite.getUserId() + " and product " + favorite.getProductId());
+        }
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO favorites (user_id, product_id) VALUES (?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            ps.setInt(1, favorite.getUserId());
+            ps.setInt(2, favorite.getProductId());
+            return ps;
+        }, keyHolder);
+
+        Number generatedKey = keyHolder.getKey();
+        if (generatedKey != null) {
+            favorite.setFavoriteId(generatedKey.intValue());
+        } else {
+            throw new IllegalStateException("Failed to generate favorite ID");
+        }
+
         return favorite;
     }
     

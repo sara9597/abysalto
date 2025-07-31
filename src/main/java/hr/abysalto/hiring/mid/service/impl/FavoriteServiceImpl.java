@@ -4,60 +4,77 @@ import hr.abysalto.hiring.mid.model.Favorite;
 import hr.abysalto.hiring.mid.model.Product;
 import hr.abysalto.hiring.mid.repository.FavoriteRepository;
 import hr.abysalto.hiring.mid.service.FavoriteService;
+import hr.abysalto.hiring.mid.service.ProductService;
+import hr.abysalto.hiring.mid.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FavoriteServiceImpl implements FavoriteService {
-    
+
     private final FavoriteRepository favoriteRepository;
-    private final ProductServiceImpl productService;
-    
-    public FavoriteServiceImpl(FavoriteRepository favoriteRepository, ProductServiceImpl productService) {
+    private final ProductService productService;
+    private final UserService userService;
+
+    public FavoriteServiceImpl(FavoriteRepository favoriteRepository, ProductService productService, UserService userService) {
         this.favoriteRepository = favoriteRepository;
         this.productService = productService;
+        this.userService = userService;
     }
-    
+
     public List<Favorite> getUserFavorites(Integer userId) {
         List<Favorite> favorites = favoriteRepository.findByUserId(userId);
-        
-        return favorites.stream()
-                .map(favorite -> {
-                    Optional<Product> product = productService.getProductById(favorite.getProductId());
-                    product.ifPresent(favorite::setProduct);
-                    return favorite;
-                })
-                .collect(Collectors.toList());
-    }
-    
-    public Favorite addToFavorites(Integer userId, Integer productId) {
-        Optional<Product> product = productService.getProductById(productId);
-        if (product.isEmpty()) {
-            throw new RuntimeException("Product not found");
+
+        for (Favorite favorite : favorites) {
+            try {
+                Product product = productService.getProductById(favorite.getProductId());
+                favorite.setProduct(product);
+            } catch (Exception e) {
+                System.err.println("Product not found for ID: " + favorite.getProductId());
+            }
         }
-        
-        if (favoriteRepository.existsByUserIdAndProductId(userId, productId)) {
+
+        return favorites;
+    }
+
+    public Favorite addToFavorites(Integer userId, Integer productId) {
+        Product product;
+        try {
+            product = productService.getProductById(productId);
+        } catch (Exception e) {
+            throw new RuntimeException("Product not found with ID: " + productId, e);
+        }
+
+        Optional<Favorite> existingFavorite = favoriteRepository.findByUserIdAndProductId(userId, productId);
+
+        if (existingFavorite.isPresent()) {
             throw new RuntimeException("Product already in favorites");
         }
-        
+
         Favorite favorite = new Favorite();
         favorite.setUserId(userId);
         favorite.setProductId(productId);
-        return favoriteRepository.save(favorite);
+        favorite.setProduct(product);
+
+        if(!userService.getUserById(userId).isPresent()) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+        try {
+            Favorite savedFavorite = favoriteRepository.save(favorite);
+            return savedFavorite;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
-    
-    public boolean removeFromFavorites(Integer userId, Integer productId) {
-        return favoriteRepository.deleteByUserIdAndProductId(userId, productId);
+
+    public void removeFromFavorites(Integer userId, Integer productId) {
+        favoriteRepository.deleteByUserIdAndProductId(userId, productId);
     }
-    
+
     public boolean isFavorite(Integer userId, Integer productId) {
         return favoriteRepository.existsByUserIdAndProductId(userId, productId);
-    }
-    
-    public Optional<Favorite> getFavorite(Integer userId, Integer productId) {
-        return favoriteRepository.findByUserIdAndProductId(userId, productId);
     }
 } 

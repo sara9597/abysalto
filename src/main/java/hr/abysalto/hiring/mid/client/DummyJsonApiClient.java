@@ -1,6 +1,7 @@
 package hr.abysalto.hiring.mid.client;
 
 import hr.abysalto.hiring.mid.dto.ProductResponse;
+import hr.abysalto.hiring.mid.model.Category;
 import hr.abysalto.hiring.mid.model.Product;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ public interface DummyJsonApiClient {
     Product getProductById(@PathVariable Integer id);
     
     @GetMapping("/products/categories")
-    List<String> getCategories();
+    List<Category> getCategories();
     
     @GetMapping("/products/category/{category}")
     ProductResponse getProductsByCategory(@PathVariable String category,

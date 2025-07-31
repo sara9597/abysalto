@@ -1,6 +1,7 @@
 package hr.abysalto.hiring.mid.controller;
 
 import hr.abysalto.hiring.mid.dto.ProductResponse;
+import hr.abysalto.hiring.mid.model.Category;
 import hr.abysalto.hiring.mid.model.Product;
 import hr.abysalto.hiring.mid.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,60 +11,68 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
-@Tag(name = "Product Management", description = "APIs for product browsing and search")
+@Tag(name = "Products", description = "Product management APIs")
 public class ProductController {
-    
+
     private final ProductService productService;
-    
+
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
-    
+
     @GetMapping
-    @Operation(summary = "Get all products with pagination")
+    @Operation(summary = "Get all products with pagination and sorting")
     public ResponseEntity<ProductResponse> getAllProducts(
             @Parameter(description = "Number of products to skip") @RequestParam(defaultValue = "0") int skip,
-            @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit) {
-        ProductResponse response = productService.getAllProducts(skip, limit);
+            @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Sort field (title, price, rating, stock)") @RequestParam(defaultValue = "title") String sortBy,
+            @Parameter(description = "Sort direction (asc, desc)") @RequestParam(defaultValue = "asc") String sortOrder) {
+        
+        ProductResponse response = productService.getAllProducts(skip, limit, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/{id}")
     @Operation(summary = "Get product by ID")
     public ResponseEntity<Product> getProductById(@PathVariable Integer id) {
-        Optional<Product> product = productService.getProductById(id);
-        return product.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Product product = productService.getProductById(id);
+        return ResponseEntity.ok(product);
     }
-    
+
     @GetMapping("/categories")
     @Operation(summary = "Get all product categories")
-    public ResponseEntity<List<String>> getCategories() {
-        List<String> categories = productService.getCategories();
+    public ResponseEntity<List<Category>> getCategories() {
+        System.out.println("Get all categories called.");
+        List<Category> categories = productService.getCategories();
         return ResponseEntity.ok(categories);
     }
-    
+
     @GetMapping("/category/{category}")
-    @Operation(summary = "Get products by category with pagination")
+    @Operation(summary = "Get products by category with pagination and sorting")
     public ResponseEntity<ProductResponse> getProductsByCategory(
             @PathVariable String category,
             @Parameter(description = "Number of products to skip") @RequestParam(defaultValue = "0") int skip,
-            @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit) {
-        ProductResponse response = productService.getProductsByCategory(category, skip, limit);
+            @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Sort field (title, price, rating, stock)") @RequestParam(defaultValue = "title") String sortBy,
+            @Parameter(description = "Sort direction (asc, desc)") @RequestParam(defaultValue = "asc") String sortOrder) {
+        
+        ProductResponse response = productService.getProductsByCategory(category, skip, limit, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/search")
-    @Operation(summary = "Search products")
+    @Operation(summary = "Search products with pagination and sorting")
     public ResponseEntity<ProductResponse> searchProducts(
-            @Parameter(description = "Search query") @RequestParam String q,
+            @Parameter(description = "Search query") @RequestParam String query,
             @Parameter(description = "Number of products to skip") @RequestParam(defaultValue = "0") int skip,
-            @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit) {
-        ProductResponse response = productService.searchProducts(q, skip, limit);
+            @Parameter(description = "Number of products to return") @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Sort field (title, price, rating, stock)") @RequestParam(defaultValue = "title") String sortBy,
+            @Parameter(description = "Sort direction (asc, desc)") @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        ProductResponse response = productService.searchProducts(query, skip, limit, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
 } 

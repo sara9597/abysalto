@@ -3,6 +3,7 @@ package hr.abysalto.hiring.mid.controller;
 import hr.abysalto.hiring.mid.model.Favorite;
 import hr.abysalto.hiring.mid.service.FavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,19 +32,17 @@ public class FavoriteController {
     @PostMapping("/add")
     @Operation(summary = "Add product to favorites")
     public ResponseEntity<Favorite> addToFavorites(@RequestParam Integer userId, @RequestParam Integer productId) {
-        try {
-            Favorite favorite = favoriteService.addToFavorites(userId, productId);
+         Favorite favorite = favoriteService.addToFavorites(userId, productId);
             return ResponseEntity.status(HttpStatus.CREATED).body(favorite);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
     }
-    
+
     @DeleteMapping("/remove")
     @Operation(summary = "Remove product from favorites")
-    public ResponseEntity<Void> removeFromFavorites(@RequestParam Integer userId, @RequestParam Integer productId) {
-        boolean removed = favoriteService.removeFromFavorites(userId, productId);
-        return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<Void> removeFromFavorites(
+            @Parameter(description = "User ID") @RequestParam Integer userId,
+            @Parameter(description = "Product ID") @RequestParam Integer productId) {
+        favoriteService.removeFromFavorites(userId, productId);
+        return ResponseEntity.noContent().build();
     }
     
     @GetMapping("/check")
